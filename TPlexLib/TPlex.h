@@ -4,8 +4,10 @@
 #include "TLine.h"
 #include "TSquare.h"
 #include "TCanvas.h"
+#include "Stack.h"
 
 #include <string>
+#include <iostream>
 
 class TPlex : public TBase {
 protected:
@@ -25,7 +27,7 @@ public:
 
 	virtual TBase* GetChild(int i);
 	virtual void SetChild(TBase* c, int i);
-	virtual TBase* PrintAll(TBase* p);
+	virtual TBase* PrintAll();
 	TBase* GetLeft();
 	TBase* GetRight();
 
@@ -42,6 +44,8 @@ public:
 	}
 
 	virtual TBase* Clone();
+
+	friend std::ostream& operator<<(std::ostream& out, const TPlex& _plex);
 };
 
 TPlex::TPlex() 
@@ -124,18 +128,13 @@ TPlex::TPlex(const TPlex& p)
 
 void TPlex::Print()
 {
-	PrintAll(0);
+	PrintAll();
 };
 
-TBase* TPlex::PrintAll(TBase* p)
+TBase* TPlex::PrintAll()
 {
-	TBase* p1 = left->PrintAll(0);
-	TBase* p2 = right->PrintAll(0);
-	std::cout << "Plex: " << std::endl;
-	p1->Print();
-	p2->Print();
-	std::cout << std::endl;
-	return p2;
+	std::cout << *this << "\n";
+	return 0;
 }
 
 double TPlex::GetVal(int i) {
@@ -201,36 +200,156 @@ void TPlex::SetRight(TBase* x)
 }
 bool TPlex::AddLine(TPoint* a, TPoint* b)
 {
-	TPlex* l = GetLeftPlex();
-	bool isAdd = false;
-	if (l != 0)
-		isAdd = l->AddLine(a, b);
-	else
-	{
-		if (left == a)
-		{
-			left = new TPlex(b, a);
-			return true;
-		}
-	}
-	if (isAdd)
-		return isAdd;
+	TStack<TBase*> stack(200);
+	stack.Push(this);
+	bool result = false;
 
-	TPlex* r = GetLeftPlex();
-	if (r != 0)
-		isAdd = r->AddLine(a, b);
-	else
+	while (!stack.IsEmpty())
 	{
-		if (right->GetVal(0) == a->GetX0() && right->GetVal(1) == a->GetX1())
+		//Получаем элементы из стека
+		TBase* top_base = stack.Get();
+		TBase* right_base = top_base->GetChild(0);
+		TBase* left_base = top_base->GetChild(1);
+
+		//Если потомок правого не нулевой, записываем в стек
+		if (right_base->GetChildCount() != 0)
 		{
-			right = new TPlex(b, a);
-			return true;
+			stack.Push(right_base);
+		} //Если правый равен а
+		else if (right_base == a)
+		{
+			//Устанавливаем потомка
+			TPlex* new_plex = new TPlex(a, b);
+			top_base->SetChild(new_plex, 0);
+			result = true;
+			break;
+		}
+
+		//Если левый потомок не нулевой, записываем в стек
+		if (left_base->GetChildCount() != 0)
+		{
+			stack.Push(left_base);
+		} //Если левый равне В
+		else if (left_base == b)
+		{
+			//Устанавливаем потомка
+			TPlex* new_plex = new TPlex(b, a);
+			top_base->SetChild(new_plex, 1);
+			result = true;
+			break;
 		}
 	}
-	return isAdd;
+	return result;
 }
 
 TBase* TPlex::Clone()
 {
 	return new TPlex(*this);
+}
+
+std::ostream& operator<<(std::ostream& out, const TPlex& _plex)
+{
+	TBase* base = const_cast<TPlex*>(&_plex);
+	TPoint* point_first = NULL;
+	TPoint* point_second = NULL;
+
+	//Создаем стек, записываем в него бэйс
+	TStack<TBase*> stack(200);
+	stack.Push(base);
+
+	while (!stack.IsEmpty())
+	{
+		//Извлекаем из стека
+		base = stack.Get();
+
+		while (point_first == NULL)
+		{
+			//Поулчаем левого потомка
+			TBase* left_base = base->GetChild(0);
+			TPlex* plex = dynamic_cast<TPlex*>(left_base);
+			if (plex == NULL)
+			{
+				//Если плекс нулевой - достаем точку
+				point_first = dynamic_cast<TPoint*>(left_base);
+			}
+			else
+			{
+				//Возвращаем бэйс в стек
+				stack.Push(base);
+				base = left_base;
+			}
+		}
+
+		while (point_second == NULL)
+		{
+			//Получаем правого потомка
+			TBase* right_base = base->GetChild(1);
+			TPlex* plex = dynamic_cast<TPlex*>(right_base);
+
+			if (plex == NULL)
+			{
+				//Если плекс нулевой - достаем точку
+				point_second = dynamic_cast<TPoint*>(right_base);
+			}
+			else
+			{
+				//Возвращаем бэйс в стек
+				stack.Push(base);
+				base = right_base;
+			}
+		}
+
+		//Если обе точки не нулевые - выводим
+		if (point_first != NULL && point_second != NULL) 
+		{
+			//Выводим точки
+			out << "Point left: " << *point_first << "\n";
+			out << "Point right: " << *point_second << "\n\n";
+			TBase* tmp_base = point_second;
+			
+			//Если стек еще не пустой
+			if (!stack.IsEmpty()) 
+			{
+				//Поулчаем элемент из стека
+				base = stack.Get(); 
+				//Поулчаем потомков
+				TBase* base_left = base->GetChild(0);
+				TBase* base_right = base->GetChild(1);
+
+				//Приводим потомков к плексу
+				TPlex* plex_left = dynamic_cast<TPlex*>(base_left);
+				TPlex* plex_right = dynamic_cast<TPlex*>(base_right);
+
+				//Если плексы не нулевые
+				if (plex_left != NULL && plex_right != NULL)
+				{
+					//Создаем новый плекс
+					TPlex* plex_new = new TPlex(point_second, 0);
+					//Устанавливаем потомка
+					plex_new->SetChild(base_right, 1);
+					//Записываем в стек
+					stack.Push(plex_new);
+					//Зануляем
+					point_second = NULL;
+					point_first = NULL;
+				}
+				else //Если плексы нулевые, то приводим к точкам
+				{
+					if (plex_left != NULL) 
+					{
+						point_first = dynamic_cast<TPoint*>(tmp_base);
+						point_second = NULL;
+					}
+					else 
+					{
+						point_second = dynamic_cast<TPoint*>(tmp_base);
+						point_first = NULL;
+					}
+
+					stack.Push(base);
+				}
+			}
+		}
+	}
+	return out;
 }

@@ -25,6 +25,12 @@ public:
 	virtual TBase* GetChild(int i);
 
 	virtual TBase* Clone();
+
+	friend std::ostream& operator<<(std::ostream& out, const TLine& line)
+	{
+		out << "(" << line.p1 << "; " << line.p2 << ")";
+		return out;
+	}
 };
 
 TLine::TLine(const TPoint& _p1, const TPoint& _p2) {

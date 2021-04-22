@@ -26,6 +26,12 @@ public:
 	void SetX0(double x);
 	void SetX1(double x);
 	virtual TBase* Clone();
+
+	friend std::ostream& operator<<(std::ostream& out, const TPoint& point)
+	{
+		out << point.x0 << " " << point.x1;
+		return out;
+	}
 };
 
 TPoint::TPoint(double _x0, double _x1) {

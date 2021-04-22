@@ -8,8 +8,8 @@ TEST(TPlex, creating_empty_plex)
 
 TEST(TPlex, creating_non_empty_plex) 
 {
-	TPoint a(12, 23);
-	TPoint b(34, 45);
+	TPoint a(8, 13);
+	TPoint b(25, 34);
 	
   ASSERT_NO_THROW(TPlex q(&a, &b));
 }
@@ -17,9 +17,9 @@ TEST(TPlex, creating_non_empty_plex)
 
 TEST(TPlex, adding_line_in_plex) 
 {
-	TPoint a(12, 23);
-	TPoint b(34, 45);
-	TPoint c(56, 67);
+	TPoint a(8, 13);
+	TPoint b(25, 34);
+	TPoint c(47, 54);
 
 	TPlex q(&a, &b);
 	
@@ -28,18 +28,18 @@ TEST(TPlex, adding_line_in_plex)
 
 TEST(TLine, creating_line) 
 {
-	TPoint a(12, 23);
-	TPoint b(34, 45);
+	TPoint a(8, 13);
+	TPoint b(25, 34);
   
   ASSERT_NO_THROW(TLine AB(a, b));
 }
 
 TEST(TSquare, creating_square) 
 {
-	TPoint a(12, 23);
-	TPoint b(34, 45);
-	TPoint c(56, 67);
-	TPoint d(89, 110);
+	TPoint a(8, 13);
+	TPoint b(25, 34);
+	TPoint c(47, 54);
+	TPoint d(73, 92);
 
 	TLine AB(a, b);
 	TLine BC(b, c);
@@ -56,8 +56,8 @@ TEST(TCanvas, getting_empty_canvas)
 
 TEST(TCanvas, getting_canvas_from_plex) 
 {
-	TPoint a(12, 23);
-	TPoint b(34, 45);
+	TPoint a(8, 13);
+	TPoint b(25, 34);
 	TPlex q(&a, &b);
 
 	TCanvas z;
@@ -66,8 +66,8 @@ TEST(TCanvas, getting_canvas_from_plex)
 
 TEST(TCanvas, getting_canvas_from_line)
 {
-	TPoint a(12, 23);
-	TPoint b(34, 45);
+	TPoint a(8, 13);
+	TPoint b(25, 34);
 
 	TLine AB(a, b);
 
@@ -77,18 +77,18 @@ TEST(TCanvas, getting_canvas_from_line)
 
 TEST(TCanvas, getting_canvas_from_point)
 {
-	TPoint a(12, 23);
-
+	TPoint a(8, 13);
+	
 	TCanvas z;
 	ASSERT_NO_THROW(z.AddObj(&a));
 }
 
 TEST(TCanvas, getting_canvas_from_square)
 {
-	TPoint a(12, 23);
-	TPoint b(34, 45);
-	TPoint c(56, 67);
-	TPoint d(89, 110);
+	TPoint a(8, 13);
+	TPoint b(25, 34);
+	TPoint c(47, 54);
+	TPoint d(73, 92);
 
 	TLine AB(a, b);
 	TLine BC(b, c);
@@ -103,14 +103,14 @@ TEST(TCanvas, getting_canvas_from_square)
 
 TEST(Print, using_print_to_point)
 {
-	TPoint a(12, 23);
+	TPoint a(8, 13);
 	ASSERT_NO_THROW(a.Print());
 }
 
 TEST(Print, using_print_to_plex)
 {
-	TPoint a(12, 23);
-	TPoint b(34, 45);
+	TPoint a(8, 13);
+	TPoint b(25, 34);
 
 	TPlex q(&a, &b);
 	ASSERT_NO_THROW(q.Print());
@@ -118,10 +118,18 @@ TEST(Print, using_print_to_plex)
 
 TEST(Print, using_print_to_line)
 {
-	TPoint a(12, 23);
-	TPoint b(34, 45);
+	TPoint a(8, 13);
+	TPoint b(25, 34);
 
 	TLine l(a, b);
 	ASSERT_NO_THROW(l.Print());
 }
 
+TEST(Print, using_print_all)
+{
+	TPoint a(8, 13);
+	TPoint b(25, 34);
+
+	TPlex q(&a, &b);
+	ASSERT_NO_THROW(q.PrintAll());
+}

@@ -9,6 +9,7 @@ set(TLineLib TLineLib) #Переменная с именем библиотек�
 set(TPlexLib TPlexLib) #Переменная с именем библиотеки
 set(TPointLib TPointLib) #Переменная с именем библиотеки
 set(TSquareLib TSquareLib) #Переменная с именем библиотеки
+set(StackLib StackLib) #Переменная с именем библиотеки
 set(main main)
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configs" FORCE) #Создается переменная CMAKE_CONFIGURATION_TYPES со значением "Debug;Release" и меткой/разделом Configs, переменная сохраниется в специальном файле доступном из всех файлов,
@@ -22,6 +23,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/TLineLib)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/TPlexLib) 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/TPointLib) 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/TSquareLib)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/StackLib)
 
 #Добавляем директорию с под-CMakeList-ом, и выполняем под-CMakeList
 add_subdirectory(TBaseLib)
@@ -30,6 +32,7 @@ add_subdirectory(TLineLib)
 add_subdirectory(TPlexLib)
 add_subdirectory(TPointLib)
 add_subdirectory(TSquareLib)
+add_subdirectory(StackLib)
 add_subdirectory(main)
 
 add_subdirectory(gtest)
